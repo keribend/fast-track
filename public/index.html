@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+  <title>Fast Track Quiz</title>
+</head>
+
+<body>
+  <div id="app">
+    <v-app>
+      <v-content>
+        <v-container fluid fill-height>
+          <v-layout align-center justify-center>
+            <v-flex xs12 sm8 md4>
+              <v-card v-if="isLoading" elevation-12>
+                <v-toolbar dark color="primary">
+                  <v-toolbar-title> Loading </v-toolbar-title>
+                </v-toolbar>
+                <v-card-text justify-center>
+                  <v-progress-linear :indeterminate="true"></v-progress-linear>
+                </v-card-text>
+              </v-card>
+              <v-card v-if="!isLoading && showQuestionnaire" elevation-12>
+                <v-toolbar dark color="primary">
+                  <v-toolbar-title> Take your test! </v-toolbar-title>
+                </v-toolbar>
+                <v-card-text justify-center>
+                  <v-stepper v-model="stepper" vertical>
+                    <template v-for="(question, index) in questionnaire" :key=index>
+                      <v-stepper-step
+                        :edit-icon="'check'"
+                        :complete-icon="'edit'"
+                        :step="index + 1"
+                        :complete="(index + 1) <= stepper"
+                        :editable="(index + 1) < stepper"
+                      >
+                        {{ question.text }}
+                      </v-stepper-step>
+                      <v-stepper-content
+                        :step="index+1"
+                        :key="`${index}-content`"
+                        >
+                        <v-radio-group v-model="selectedAnswers[question.id]">
+                          <v-radio
+                            v-for="answer in question.Answers"
+                            :key="answer.id"
+                            :label="`${answer.text}`"
+                            :value="answer.id"
+                            @change="stepper += 1"
+                          ></v-radio>
+                        </v-radio-group>
+                      </v-stepper-content>
+                    </template>
+                  </v-stepper>
+                  <v-btn
+                    :disabled="stepper != questionnaire.length + 1"
+                    color="primary"
+                    @click="submitAnswers('click')"
+                  >Submit</v-btn>
+                </v-card-text>
+              </v-card>
+              <v-card v-if="!isLoading && showResult" elevation-12>
+                <v-toolbar dark color="primary">
+                  <v-toolbar-title> Your result </v-toolbar-title>
+                </v-toolbar>
+                <v-img src="/public/img/trophy.jpg"></v-img>                
+                <v-card-text>
+                  <v-list>
+                    <v-list-tile @click="" :key="`result.answeredQuestions`">
+                    <v-list-tile-content>
+                      <v-list-tile-title>
+                        Answered Questions: {{ result.answeredQuestions }}
+                      </v-list-tile-title>
+                    </v-list-tile-content>
+                    </v-list-tile>
+                    <v-list-tile @click="" :key="`result.correctAnswers`">
+                      <v-list-tile-content>
+                      <v-list-tile-title>
+                        Correct Answers: {{ result.correctAnswers }}
+                      </v-list-tile-title>
+                    </v-list-tile-content>
+                    </v-list-tile>
+                    <v-list-tile @click="" :key="`result.successRatio`">
+                      <v-list-tile-content>
+                      <v-list-tile-title v-if="result.currentSuccessRatio >= result.globalSuccessRatio">
+                        You scored more than the average of other quizzers!
+                      </v-list-tile-title>
+                      <v-list-tile-title v-else>
+                        Unluckily you scored less than the average of other quizzers :(
+                      </v-list-tile-title>
+                    </v-list-tile-content>
+                    </v-list-tile>
+                  </v-list>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn flat color="primary" @click="loadQuestionnaire()">Retry</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-content>
+    </v-app>
+  </div>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+  <script src="/public/main.js"></script>
+</body>
+
+</html>
