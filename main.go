@@ -3,6 +3,7 @@ package main
 import (
 	"fast-track/handlers"
 	"fast-track/models"
+	"os"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -22,7 +23,14 @@ func main() {
 	e.File("/", "public/index.html")
 
 	// Start server
-	e.Logger.Fatal(e.Start(":9000"))
+
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		e.Logger.Fatal("$PORT must be set")
+	}
+
+	e.Logger.Fatal(e.Start(":" + port))
 }
 
 func init() {
